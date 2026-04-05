@@ -1,0 +1,37 @@
+{% if messages %}
+  <div class="flex flex-col gap-4 mb-8">
+    {% for message in messages %}
+      <div class="flex items-center gap-4 px-6 py-4 rounded-2xl border-l-4 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300
+        {% if message.tags == 'success' %}
+          bg-green-50 border-green-500 text-green-800
+        {% elif message.tags == 'error' or message.tags == 'danger' %}
+          bg-red-50 border-red-500 text-red-800
+        {% elif message.tags == 'info' %}
+          bg-cyan-50 border-cyan-500 text-cyan-800
+        {% else %}
+          bg-gray-50 border-gray-500 text-gray-800
+        {% endif %}
+      ">
+        <div class="flex-shrink-0 text-xl">
+          {% if message.tags == 'success' %}
+            <i class="fa-solid fa-circle-check"></i>
+          {% elif message.tags == 'error' or message.tags == 'danger' %}
+            <i class="fa-solid fa-circle-xmark"></i>
+          {% elif message.tags == 'info' %}
+            <i class="fa-solid fa-circle-info"></i>
+          {% else %}
+            <i class="fa-solid fa-bell"></i>
+          {% endif %}
+        </div>
+        
+        <p class="font-bold text-sm leading-tight uppercase tracking-wide">
+          {{ message }}
+        </p>
+        
+        <button onclick="this.parentElement.remove()" class="ml-auto text-gray-400 hover:text-gray-600 transition-colors focus:outline-none">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

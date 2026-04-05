@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ShopCart | Create Account{% endblock %}
+
+{% block main_content %}
+<div class="min-h-[80vh] flex items-center justify-center py-20 px-4 bg-gray-50">
+  <div class="w-full max-w-lg bg-white shadow-2xl rounded-3xl p-10 border border-gray-100 transition-all hover:shadow-cyan-100">
+    <div class="text-center space-y-2 mb-10">
+      <div class="w-16 h-16 bg-cyan-100 text-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+        <i class="fa-solid fa-user-plus"></i>
+      </div>
+      <h1 class="text-4xl font-black text-gray-900 tracking-tight">Join ShopCart</h1>
+      <p class="text-gray-400 font-medium italic">Create your account to start shopping</p>
+    </div>
+
+    {% include "alert.html" %}
+
+    <form method="POST" action="" class="grid grid-cols-1 gap-6 mt-6">
+      {% csrf_token %}
+      
+      <!-- Username Field -->
+      <div class="space-y-2">
+        <label for="username" class="block text-sm font-bold text-gray-700 uppercase tracking-widest px-1">Username</label>
+        <div class="relative group">
+          <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 group-focus-within:text-cyan-500 transition-colors">
+            <i class="fa-solid fa-at"></i>
+          </span>
+          <input 
+            type="text" 
+            required 
+            placeholder="Unique username" 
+            name="username" 
+            id="username"
+            class="w-full pl-11 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:bg-white transition-all shadow-inner"
+          >
+        </div>
+      </div>
+
+      <!-- Email Field -->
+      <div class="space-y-2">
+        <label for="email" class="block text-sm font-bold text-gray-700 uppercase tracking-widest px-1">Email Address</label>
+        <div class="relative group">
+          <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 group-focus-within:text-cyan-500 transition-colors">
+            <i class="fa-solid fa-envelope"></i>
+          </span>
+          <input 
+            type="email" 
+            required 
+            placeholder="Email address" 
+            name="email" 
+            id="email"
+            class="w-full pl-11 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:bg-white transition-all shadow-inner"
+          >
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="space-y-2">
+        <label for="password" class="block text-sm font-bold text-gray-700 uppercase tracking-widest px-1">Password</label>
+        <div class="relative group">
+          <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 group-focus-within:text-cyan-500 transition-colors">
+            <i class="fa-solid fa-shield-halved"></i>
+          </span>
+          <input 
+            type="password" 
+            required 
+            placeholder="Strong password" 
+            name="password" 
+            id="password"
+            autocomplete="new-password" 
+            class="w-full pl-11 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:bg-white transition-all shadow-inner"
+          >
+        </div>
+      </div>
+
+      <div class="px-1 text-xs text-gray-400 leading-relaxed italic">
+        By clicking Register, you agree to our 
+        <a href="#" class="text-cyan-600 font-bold hover:underline">Terms of Service</a> and 
+        <a href="#" class="text-cyan-600 font-bold hover:underline">Privacy Policy</a>.
+      </div>
+
+      <div class="pt-2">
+        <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-cyan-100 transition-all active:scale-[0.98] flex items-center justify-center gap-3 text-lg group">
+          <i class="fa-solid fa-paper-plane group-hover:translate-x-1 transition-transform"></i>
+          Register Account
+        </button>
+      </div>
+
+      <div class="text-center pt-6 border-t border-gray-100">
+        <p class="text-gray-400">
+          Already have an account? 
+          <a href="{% url 'login' %}" class="font-black text-cyan-600 hover:text-cyan-700 hover:underline underline-offset-4">Sign In Instead</a>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

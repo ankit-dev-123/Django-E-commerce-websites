@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ShopCart | Your Shopping Cart{% endblock %}
+
+{% block main_content %}
+<div class="max-w-7xl mx-auto my-16 px-6">
+  <div class="flex items-center justify-between mb-12">
+    <h1 class="text-4xl font-black text-gray-900 tracking-tight">
+      Shopping Bag 
+      <span class="text-cyan-600 ml-2">({{ cart_items|length|default:"0" }})</span>
+    </h1>
+    <a href="{% url 'products' %}" class="text-sm font-bold text-cyan-600 hover:text-cyan-700 flex items-center gap-2 group transition-all">
+      <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+      Continue Shopping
+    </a>
+  </div>
+
+  {% if cart_items %}
+  <div class="grid lg:grid-cols-3 gap-12 items-start">
+    
+    <!-- Left Column: Cart Items -->
+    <div class="lg:col-span-2 space-y-6">
+      
+      <!-- Table Header (Hidden on small screens) -->
+      <div class="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 rounded-2xl text-xs font-bold text-gray-400 uppercase tracking-widest border border-gray-100 shadow-sm">
+        <div class="col-span-6">Product Details</div>
+        <div class="col-span-2 text-center">Price</div>
+        <div class="col-span-2 text-center">Quantity</div>
+        <div class="col-span-2 text-right">Total</div>
+      </div>
+
+      <div class="space-y-4">
+        {% for item in cart_items %}
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center px-6 py-6 bg-white rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:border-cyan-100 transition-all group">
+          
+          <!-- Product Info -->
+          <div class="md:col-span-6 flex items-center gap-6">
+            <div class="w-24 h-24 bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 shadow-inner flex-shrink-0">
+              <a href="{% url 'single-product' item.product.slug %}">
+                <img src="{{ item.product.images.first.image.url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="{{ item.product.name }}" />
+              </a>
+            </div>
+            <div class="space-y-1">
+              <h2 class="text-xl font-bold text-gray-800 group-hover:text-cyan-600 transition-colors">{{ item.product.name }}</h2>
+              <p class="text-xs font-semibold text-gray-400 uppercase tracking-tighter">{{ item.product.product_type.sub_category.name }}</p>
+              <div class="md:hidden flex items-center gap-2 mt-2">
+                <span class="text-lg font-black text-cyan-600">₹{{ item.product.price|floatformat:2 }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div class="hidden md:block col-span-2 text-center">
+            <span class="text-lg font-bold text-gray-700">₹{{ item.product.price|floatformat:2 }}</span>
+          </div>
+
+          <!-- Quantity Selector -->
+          <div class="col-span-2 flex justify-center">
+            <div class="flex items-center bg-gray-50 p-1 rounded-xl border border-gray-100 shadow-inner">
+              <!--Decrease Quantity-->
+              <a href="{% url 'decrease_quantity' item.id %}"><button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-cyan-600 hover:bg-white rounded-lg transition-all focus:outline-none"><i class="fa-solid fa-minus text-[10px]"></i></button></a>
+              <span class="w-10 text-center font-bold text-gray-800">{{ item.quantity|default:"1" }}</span>
+              <!--Increase Quantity-->
+              <a href="{% url 'increase_quantity' item.id %}"><button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-cyan-600 hover:bg-white rounded-lg transition-all focus:outline-none"><i class="fa-solid fa-plus text-[10px]"></i></button></a>
+            </div>
+          </div>
+
+          <!-- Subtotal & Remove -->
+          <div class="md:col-span-2 flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-2">
+            <p class="text-xl font-black text-gray-900">₹{{ item.get_total_price|floatformat:2 }}</p>
+            <a href="{% url 'remove_cart_item' item.id %}">
+              <button class="w-8 h-8 rounded-full flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90 shadow-sm md:shadow-none">
+                <i class="fa-solid fa-trash-can text-sm"></i>
+              </button>
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Right Column: Order Summary -->
+    <aside class="space-y-6 lg:sticky lg:top-32">
+      <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl border border-gray-50 flex flex-col gap-6">
+        <h2 class="text-2xl font-black text-gray-900 border-b border-gray-50 pb-6">Payment Details</h2>
+        
+        <div class="space-y-4">
+          <div class="flex justify-between items-center text-sm">
+            <span class="font-bold text-gray-400 uppercase tracking-widest">Subtotal</span>
+            <span class="font-black text-gray-700">₹{{ total_price|floatformat:2 }}</span>
+          </div>
+          <div class="flex justify-between items-center text-sm">
+            <span class="font-bold text-gray-400 uppercase tracking-widest">Tax (2%)</span>
+            <span class="font-black text-gray-700">₹{{ tax|floatformat:2 }}</span>
+          </div>
+          <div class="flex justify-between items-center text-sm">
+            <span class="font-bold text-gray-400 uppercase tracking-widest">Shipping</span>
+            <span class="font-black text-green-500 underline decoration-2 underline-offset-4 decoration-green-100">FREE</span>
+          </div>
+        </div>
+
+        <div class="h-px bg-gray-100 w-full my-2"></div>
+
+        <div class="flex justify-between items-end">
+          <span class="text-sm font-black text-gray-900 uppercase tracking-tighter">Grand Total</span>
+          <span class="text-4xl font-black text-cyan-600 tracking-tighter">₹{{ grand_total|floatformat:2 }}</span>
+        </div>
+
+        <div class="pt-6">
+          <button id="rzp-button" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-black py-5 rounded-2xl shadow-xl shadow-cyan-100 transition-all active:scale-95 flex items-center justify-center gap-3 text-lg group">
+            <i class="fa-solid fa-shield-halved group-hover:rotate-12 transition-transform"></i>
+            Secure Checkout
+          </button>
+        </div>
+
+        <div class="pt-6 space-y-4 text-center">
+            <p class="text-xs font-bold text-gray-300 uppercase tracking-widest">Guaranteed Safe Checkout</p>
+            <div class="flex justify-center items-center gap-4 flex-wrap opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700">
+                <img src="{% static 'cart/images/pay1.png' %}" class="h-6" alt="Bank" />
+                <img src="{% static 'cart/images/pay2.png' %}" class="h-6" alt="Mastercard" />
+                <img src="{% static 'cart/images/pay3.png' %}" class="h-6" alt="Visa" />
+                <img src="{% static 'cart/images/pay4.png' %}" class="h-6" alt="Visa Card" />
+            </div>
+        </div>
+      </div>
+
+      <!-- Coupon Section -->
+      <div class="bg-cyan-50 p-6 rounded-2xl border border-cyan-100 flex items-center justify-between group cursor-pointer hover:bg-cyan-100 transition-colors">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-ticket text-cyan-600 text-xl group-hover:scale-110 transition-transform"></i>
+          <span class="text-sm font-bold text-cyan-900">Have a coupon code?</span>
+        </div>
+        <i class="fa-solid fa-chevron-right text-cyan-300"></i>
+      </div>
+    </aside>
+
+  </div>
+
+  {% else %}
+  
+  <!-- Empty Cart State -->
+  <div class="flex flex-col items-center justify-center py-24 text-center space-y-8 bg-gray-50 rounded-[3rem] border border-gray-100 shadow-inner px-6">
+    <div class="relative">
+        <div class="absolute inset-0 bg-cyan-200 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+        <img src="{% static 'cart/images/empty-cart.png' %}" class="h-72 object-contain relative transition-transform duration-1000 hover:rotate-3" alt="Empty Cart" />
+    </div>
+    
+    <div class="space-y-3 max-w-md">
+        <h2 class="text-4xl font-black text-gray-800 tracking-tight">Your bag is empty</h2>
+        <p class="text-gray-400 font-medium italic leading-relaxed">
+            Looks like you haven't added anything to your cart yet. Your next favorite item is just a click away!
+        </p>
+    </div>
+
+    <a href="{% url 'products' %}" class="bg-cyan-600 hover:bg-cyan-700 text-white px-12 py-5 rounded-2xl font-black shadow-xl shadow-cyan-100 transition-all active:scale-95 flex items-center gap-3 group">
+      <i class="fa-solid fa-bag-shopping group-hover:scale-110 transition-transform"></i>
+      Explore Products
+    </a>
+  </div>
+  {% endif %}
+</div>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+
+var options = {
+
+    "key": "{{ razorpay_key }}",
+    "amount": "{{ payment.amount }}",
+    "currency": "INR",
+    "name": "My Ecommerce", 
+    "description": "Order Payment",
+    "order_id": "{{ payment.id }}",
+
+    "handler": function (response){
+      window.location.href = "{% url 'payment_success' %}";
+    }
+
+};
+
+var rzp = new Razorpay(options);
+
+document.getElementById('rzp-button').onclick = function(e){
+    rzp.open();
+    e.preventDefault();
+}
+
+</script>
+{% endblock %}

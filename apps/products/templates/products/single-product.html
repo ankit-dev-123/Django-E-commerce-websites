@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ShopCart | Single Product{% endblock %}
+
+{% block main_content %}
+<div class="max-w-7xl mx-auto my-20 px-6">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+    
+    <!-- Left Column: Product Gallery -->
+    <div class="space-y-6">
+      <div class="bg-gray-50 rounded-[2rem] p-8 border border-gray-100 shadow-sm overflow-hidden group">
+        <img id="mainImage" 
+             src="{{ product.images.first.image.url }}" 
+             alt="{{ product.name }}" 
+             class="w-full h-[600px] object-contain mix-blend-multiply transition-transform duration-700 group-hover:scale-110"
+        >
+      </div>
+      
+      <!-- Variant Thumbnails -->
+      {% if product.images.all|length > 1 %}
+      <div class="flex flex-wrap gap-4 justify-center py-2">
+        {% for p_image in product.images.all %}
+        <button onclick="document.getElementById('mainImage').src='{{ p_image.image.url }}'" 
+                class="w-20 h-24 rounded-2xl overflow-hidden border-2 border-transparent hover:border-cyan-500 hover:shadow-lg transition-all duration-300 focus:border-cyan-600 focus:outline-none active:scale-95 shadow-sm bg-gray-50"
+        >
+          <img src="{{ p_image.image.url }}" alt="variant" class="w-full h-full object-cover">
+        </button>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    
+    <!-- Right Column: Product Info -->
+    <div class="flex flex-col gap-8 lg:sticky lg:top-32">
+      
+      <div class="space-y-4">
+        <nav class="flex items-center gap-2 text-sm text-gray-400 font-medium lowercase">
+          <a href="{% url 'home' %}" class="hover:text-cyan-600">Home</a>
+          <i class="fa-solid fa-chevron-right text-[10px]"></i>
+          <a href="{% url 'products' %}" class="hover:text-cyan-600">Products</a>
+          <i class="fa-solid fa-chevron-right text-[10px]"></i>
+          <span class="text-gray-600">{{ product.name }}</span>
+        </nav>
+        
+        <h1 class="text-5xl font-black text-gray-900 leading-tight">
+          {{ product.name }}
+        </h1>
+        
+        <div class="flex items-center gap-6">
+          <div class="flex flex-col">
+            <span class="text-sm font-bold text-gray-400 uppercase tracking-widest">Price</span>
+            <span class="text-4xl font-black text-cyan-600">₹{{ product.price|floatformat:2 }}</span>
+          </div>
+          <div class="h-10 w-px bg-gray-200"></div>
+          <div class="flex flex-col">
+            <span class="text-sm font-bold text-gray-400 uppercase tracking-widest line-through">₹{{ product.price|add:1200|floatformat:0 }}</span>
+            <span class="text-green-500 font-black">58.5% SAVING</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="h-px bg-gray-100 w-full"></div>
+
+      <div class="space-y-6">
+        <p class="text-gray-500 leading-relaxed text-lg italic bg-gray-50 p-6 rounded-2xl border-l-4 border-cyan-500">
+          "{{ product.description }}"
+        </p>
+        
+        <!-- Size Selection -->
+        {% if sizes %}
+        <div class="space-y-3">
+          <span class="text-sm font-bold text-gray-900 uppercase tracking-widest">Select Size</span>
+          <div class="flex flex-wrap gap-3">
+            {% for size in sizes %}
+            <button class="min-w-[50px] h-12 flex items-center justify-center px-4 rounded-xl border-2 border-gray-100 hover:border-cyan-500 hover:bg-cyan-50 font-bold transition-all active:scale-95 shadow-sm">
+              {{ size.size_name }}
+            </button>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Quantity -->
+        <div class="space-y-3">
+          <span class="text-sm font-bold text-gray-900 uppercase tracking-widest">Quantity</span>
+          <div class="flex items-center gap-4 bg-gray-50 w-fit p-1 rounded-xl border border-gray-100 shadow-inner">
+            <button onclick="updateQuantity(-1)" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-cyan-600 hover:bg-white rounded-lg transition-all"><i class="fa-solid fa-minus"></i></button>
+            <span id="quantity-display" class="w-10 text-center font-bold text-gray-800">1</span>
+            <button onclick="updateQuantity(1)" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-cyan-600 hover:bg-white rounded-lg transition-all"><i class="fa-solid fa-plus"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-4 pt-6">
+        <a id="add-to-cart-link" href="{% url 'add_to_cart' product.slug %}?quantity=1" class="flex-grow">
+          <button class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-black py-5 rounded-2xl shadow-xl shadow-cyan-200 transition-all active:scale-95 flex items-center justify-center gap-3 text-lg group">
+            <i class="fa-solid fa-cart-shopping group-hover:rotate-12 transition-transform"></i>
+            Add to Cart
+          </button>
+        </a>
+        <button class="w-16 h-16 flex items-center justify-center rounded-2xl border-2 border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50 transition-all shadow-sm">
+          <i class="fa-regular fa-heart text-2xl"></i>
+        </button>
+      </div>
+
+      <script>
+        let currentQty = 1;
+        const display = document.getElementById('quantity-display');
+        const cartLink = document.getElementById('add-to-cart-link');
+        const baseHref = "{% url 'add_to_cart' product.slug %}";
+
+        function updateQuantity(change) {
+            currentQty = Math.max(1, currentQty + change);
+            display.innerText = currentQty;
+            // URL update karein taaki sahi quantity backend par jaye
+            cartLink.href = `${baseHref}?quantity=${currentQty}`;
+        }
+      </script>
+
+      <div class="grid grid-cols-2 gap-4 pt-4 text-sm text-gray-500">
+        <div class="flex items-center gap-3 p-4 rounded-2xl bg-gray-50 border border-gray-100">
+          <i class="fa-solid fa-shield-check text-green-500 text-xl"></i>
+          <span class="font-medium underline decoration-cyan-500/30">1 Year Warranty</span>
+        </div>
+        <div class="flex items-center gap-3 p-4 rounded-2xl bg-gray-50 border border-gray-100">
+          <i class="fa-solid fa-truck-fast text-cyan-500 text-xl"></i>
+          <span class="font-medium underline decoration-cyan-500/30">Free Delivery</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
